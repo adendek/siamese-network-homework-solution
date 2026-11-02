@@ -1,0 +1,34 @@
+default_install_hook_types: [pre-commit, commit-msg]
+
+repos:
+  # 1. File hygiene & large file guard (blocks accidental .pt/.zip commits)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=5000']
+
+  # 2. Ruff: auto-fixes safe lint issues and enforces 88-char formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        name: ruff check (auto-fix)
+        args: [--config=pyproject.toml, --fix]
+        files: ^(src|tests)/
+
+      - id: ruff-format
+        name: ruff format
+        args: [--config=pyproject.toml]
+        files: ^(src|tests)/
+
+  # 3. Commitizen: enforces conventional commit message format
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.8.3
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
