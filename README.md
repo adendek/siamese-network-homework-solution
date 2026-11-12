@@ -129,6 +129,8 @@ To ensure scientific rigor and clean software engineering habits, this project u
    uv run pre-commit install --install-hooks
    ```
 
+This is optional for now.
+
 4. **Download and prepare the face dataset**:
    ```bash
    uv run python data/download_data.py
