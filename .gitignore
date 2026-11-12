@@ -221,3 +221,4 @@ __marimo__/
 /.idea
 .DS_Store
 /notebooks/data/lfw-deepfunneled
+/notebooks/data/for_students/faces
