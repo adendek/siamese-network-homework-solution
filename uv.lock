@@ -1001,7 +1001,7 @@ wheels = [
 [[package]]
 name = "deepgate-facerec"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "jupyter" },
     { name = "matplotlib" },
@@ -1030,6 +1030,7 @@ viz = [
 [package.dev-dependencies]
 dev = [
     { name = "commitizen" },
+    { name = "ipykernel" },
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest" },
@@ -1063,6 +1064,7 @@ provides-extras = ["viz", "notebooks"]
 [package.metadata.requires-dev]
 dev = [
     { name = "commitizen", specifier = ">=4.8.2" },
+    { name = "ipykernel", specifier = ">=7.4.0" },
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pre-commit", specifier = ">=4.1.0" },
     { name = "pytest", specifier = ">=8.3.0" },
