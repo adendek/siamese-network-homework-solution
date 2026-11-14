@@ -34,48 +34,57 @@ To guide your implementation, the homework is organized into six progressive mil
 
 ---
 
-## 2. Repository Layout
+# DeepGate-FaceRec (Reference Solution)
 
-The project follows a modular, production-ready structure:
+End-to-end deep metric learning pipeline for facial recognition and automated open-set access control (`SmartGate`). Instead of closed-set softmax classification over fixed identities, the network maps face images onto a 128-dimensional unit hypersphere ($\Vert{}z\Vert{}_2 = 1$) using a pretrained CNN backbone and online semi-hard triplet mining, enabling generalization to unseen subjects at test time.
+
+---
+
+## Repository Structure
 
 ```text
 deepgate-facerec/
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml               # Automated linting, code formatting, and type checking
-│       └── tests.yml            # Unit tests and grading checks
-├── .pre-commit-config.yaml      # Git hooks for local code hygiene
-├── pyproject.toml               # Single source of truth for build, dependencies & tooling
-├── README.md                    # Assignment instructions and reference guide
-├── configs/
-│   └── config.yaml              # Hyperparameters (margin, embedding_dim, lr, P, K, epochs)
+│       ├── ci.yml                     # Automated linting, formatting, and type checking
+│       └── tests.yml                  # Automated pytest suite execution
+├── .pre-commit-config.yaml            # Local Git hooks (ruff, trailing-whitespace, YAML checks)
+├── pyproject.toml                     # Build configuration, dependencies, and tool settings
+├── README.md                          # Project overview, setup, and usage guide
+├── scripts/
+│   ├── download_data.py               # Dataset download and train/val/test split script
 ├── data/
-│   ├── download_data.py         # Automated dataset download and extraction script
-│   └── raw/                     # Face dataset directory (ignored by git)
-├── docs/                        # LaTeX report template and instructions
-│   ├── README.md                # Report guide and Overleaf setup instructions
-│   ├── deepgate_report.sty      # NeurIPS-adapted LaTeX style package
-│   ├── main.tex                 # Report master file
-│   ├── references.bib           # Bibliography references
-│   └── figures/                 # Report plots (ROC curves, UMAP embeddings)
+│   └── split/                         # Disjoint identity splits (ignored by git) and extracted by the `scripts\download_data.py`
+│       ├── train/
+│       ├── val/
+│       └── test/
+├── docs/                              # LaTeX report template and bibliography
+│   ├── README.md                      # Report compilation and Overleaf guide
+│   ├── deepgate_report.sty            # NeurIPS-adapted LaTeX style package
+│   ├── main.tex                       # Report master document
+│   └── references.bib                 # Bibliography references
+│   └── figures/                       # Generated high-DPI plots for the technical report
+│       ├── val_embeddings_tsne_comparison.png
+│       └── smartgate_threshold_analysis.png
 ├── src/
-│   ├── __init__.py
-│   ├── dataset.py               # Identity-grouped dataset and PK batch sampler
-│   ├── models.py                # Pretrained backbone + projection head
-│   ├── loss.py                  # [TODO: Student Exercise] Custom Triplet Loss
-│   ├── mining.py                # [TODO: Student Exercise] Online hard/semi-hard mining
-│   ├── trainer.py               # Metric learning training loop & distance logging
-│   ├── evaluate.py              # Verification metrics (ROC curve, AUC, EER, distance histograms)
-│   └── smart_gate.py            # [TODO: Student Exercise] Enrollment and threshold verification
+│   ├── __init__.py                    # Top-level package exports
+│   ├── data.py                        # Image transforms, identity mapping, and PKBatchSampler
+│   ├── models.py                      # Pretrained backbone + L2-normalized projection head
+│   ├── losses.py                      # TripletMarginLoss using squared Euclidean distance
+│   ├── mining.py                      # Pairwise distance matrix, PK masks, and semi-hard mining
+│   ├── trainer.py                     # MetricTrainer loop, differential LRs, and checkpointing
+│   ├── metrics.py                     # 1:1 verification pair sampling, ROC-AUC, and EER
+│   └── gate.py                        # SmartGate 1:N enrollment, verification, and threshold sweeps
 ├── notebooks/
-│   ├── 01_explore_embeddings.ipynb  # t-SNE / UMAP visualization (pre vs. post training)
-│   └── 02_smart_gate_demo.ipynb     # Interactive simulation of gate access decisions
+│   ├── training.ipynb                 # Model training, learning curves, and t-SNE comparison
+│   └── Gate.ipynb                     # SmartGate enrollment, FAR/TAR calibration, and probe demos
 └── tests/
-    ├── test_loss.py             # Grader tests for TripletLoss accuracy and gradients
-    ├── test_mining.py           # Grader tests for triplet mining logic and batch masking
-    └── test_models.py           # Output shape and L2 normalization tests
-```
-
+    ├── test_data.py                   # Tests for transforms, identity map, and PKBatchSampler
+    ├── test_losses.py                 # Tests for TripletMarginLoss values, reductions, and gradients
+    ├── test_metrics.py                # Tests for pair generation, ROC-AUC, and EER calculation
+    ├── test_mining.py                 # Tests for pairwise distances, PK masks, and semi-hard mining
+    └── test_models.py                 # Tests for FaceEmbeddingNet shapes, L2 norm, and freezing
+   ```
 ---
 
 ## 3. Engineering Stack & Tooling
